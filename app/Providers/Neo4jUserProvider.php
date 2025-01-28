@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Providers;
 
 use App\Models\Neo4jUser;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Laudis\Neo4j\Contracts\SessionInterface;
 
 class Neo4jUserProvider implements UserProvider
 {

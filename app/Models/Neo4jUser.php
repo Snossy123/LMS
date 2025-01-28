@@ -1,79 +1,46 @@
 <?php
-
 namespace App\Models;
 
-
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 
-class Neo4jUser extends Model implements Authenticatable
+class Neo4jUser implements Authenticatable
 {
-    use HasFactory;
-    protected $attributes = [];
+    use AuthenticatableTrait;
 
-    public function __construct(array $attributes)
+    protected $data;
+
+    public function __construct(array $data)
     {
-        $this->attributes = $attributes;
+        $this->data = $data;
     }
 
-
-    /**
-     * Get the name of the unique identifier for the user.
-     *
-     * @return string
-     */
     public function getAuthIdentifierName()
     {
         return 'id';
     }
 
-    /**
-     * Get the unique identifier for the user.
-     *
-     * @return mixed
-     */
     public function getAuthIdentifier()
     {
-        return $this->attributes['id'];
+        return $this->data['id'];
     }
 
-    /**
-     * Get the password for the user.
-     *
-     * @return string
-     */
     public function getAuthPassword()
     {
-        return $this->attributes['password'];
+        // If you're storing passwords, return the hashed password.
+        return $this->data['password'] ?? ''; // Example
     }
 
-    /**
-     * Get the token value for the "remember me" session.
-     *
-     * @return string
-     */
     public function getRememberToken()
     {
-        return $this->attributes['remember_token'] ?? null;
+        return $this->data['remember_token'] ?? null;
     }
 
-    /**
-     * Set the token value for the "remember me" session.
-     *
-     * @param  string  $value
-     * @return void
-     */
     public function setRememberToken($value)
     {
-        $this->attributes['remember_token'] = $value;
+        $this->data['remember_token'] = $value;
     }
 
-    /**
-     * Get the column name for the "remember me" token.
-     *
-     * @return string
-     */
     public function getRememberTokenName()
     {
         return 'remember_token';

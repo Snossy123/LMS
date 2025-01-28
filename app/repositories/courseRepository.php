@@ -8,8 +8,10 @@ use App\Interfaces\courseRepositoryInterface;
 use App\Models\Neo4jUser;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Laudis\Neo4j\Formatter\BasicFormatter;
 
 class courseRepository implements courseRepositoryInterface
 {
@@ -18,7 +20,7 @@ class courseRepository implements courseRepositoryInterface
     {
         $this->dbsession = app('neo4j')->createSession();
     }
-    public function addCourse(courseCreationRequest $request):int
+    public function addCourse(courseCreationRequest $request): int
     {
         try {
             // Run a query to create a node
@@ -59,13 +61,13 @@ class courseRepository implements courseRepositoryInterface
             $courseProperties = $courseNode->getProperties()->toArray();
             $course = [
                 'id' => $courseNode->getId(),
-                'title' => $courseProperties['title']??null,
-                'category' => $courseProperties['category']??null,
-                'level' => $courseProperties['level']??null,
-                'language' => $courseProperties['language']??null,
-                'description' => $courseProperties['description']??null,
-                'details' => $courseProperties['details']??null,
-                'imageURL' => $courseProperties['image']??null,
+                'title' => $courseProperties['title'] ?? null,
+                'category' => $courseProperties['category'] ?? null,
+                'level' => $courseProperties['level'] ?? null,
+                'language' => $courseProperties['language'] ?? null,
+                'description' => $courseProperties['description'] ?? null,
+                'details' => $courseProperties['details'] ?? null,
+                'imageURL' => $courseProperties['image'] ?? null,
             ];
             return $course;
         } catch (QueryException $e) {
@@ -77,33 +79,54 @@ class courseRepository implements courseRepositoryInterface
         }
     }
 
-    public function getAllCourses():array
+    public function index(Request $request)
+    {
+        $page = $request->query('page', 1);
+        $paginate = 10;
+        $skip = ($page - 1) * $paginate;
+
+        $query = 'MATCH (c:Course)
+                  WITH properties(c) AS props, id(c) AS id
+                  SKIP $skip LIMIT $paginate
+                  RETURN collect(apoc.map.merge(props, {id: id})) AS courses';
+
+        $result = $this->dbsession->run($query, [
+            'skip' => $skip,
+            'paginate' => $paginate,
+        ]);
+
+        $courses = $result->first()->get('courses')->toArray();
+        $totalCourses = $this->getTotalCoursesCount();
+
+        $paginatedCourses = new \Illuminate\Pagination\LengthAwarePaginator(
+            $courses,
+            $totalCourses,
+            $paginate,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return $paginatedCourses;
+    }
+
+    public function getTotalCoursesCount(): int
     {
         try {
-            $query = 'MATCH (c:Course) RETURN c';
+            // Cypher query to retrieve paginated courses
+            $query = 'MATCH (c:Course)
+                      RETURN count(c) AS totalCourses';
+
+            // Execute query with parameters
             $result = $this->dbsession->run($query);
-            $courses = [];
-            foreach ($result as $node){
-                $courseNode = $node->get('c')->getProperties()->toArray();
-                $course = [
-                    'id' => $node->get('c')->getId(),
-                    'title' => $courseNode['title']??null,
-                    'category' => $courseNode['category']??null,
-                    'level' => $courseNode['level']??null,
-                    'language' => $courseNode['language']??null,
-                    'description' => $courseNode['description']??null,
-                    'details' => $courseNode['details']??null,
-                    'imageURL' => $courseNode['image']??null,
-                ];
-                $courses[] = $course;
-            }
-            return $courses;
+            return $result->first()->get('totalCourses');
         } catch (QueryException $e) {
-            Log::error("Database Error while retrive Courses Nodes: {$e->getMessage()}");
-            throw new \Exception("A Database Error occurred, Please try again later.");
+            // Log query-specific errors and rethrow a user-friendly exception
+            Log::error("Database Error while retrieving courses: {$e->getMessage()}");
+            throw new \Exception("A database error occurred. Please try again later.");
         } catch (\Exception $e) {
-            Log::error("Unexpected Error while retrive Course Node: {$e->getMessage()}");
-            throw new \Exception("An Unexpected Error occurred, please contact your support administrator.");
+            // Log unexpected errors and rethrow
+            Log::error("Unexpected error while retrieving courses: {$e->getMessage()}");
+            throw new \Exception("An unexpected error occurred. Please contact support.");
         }
     }
 
@@ -126,26 +149,28 @@ class courseRepository implements courseRepositoryInterface
     public function editCourse(courseUpdateRequest $request)
     {
         try {
-            // Run a query to create a node
-            $query = <<<CYPHER
+            // Run a query to update a node
+            $query = '
                     MATCH (c:Course)
-                    WHERE ID(c) = \$id
+                    WHERE ID(c) = $id
                     SET c += {
-                        title: \$title,
-                        category: \$category,
-                        level: \$level,
-                        language: \$language,
-                        description: \$description,
-                        details: \$details,
-                        image: \$imageURL
+                        title: $title,
+                        category: $category,
+                        level: $level,
+                        language: $language,
+                        description: $description,
+                        details: $details,
+                        image: $imageURL
                     }
                     RETURN c
-                    CYPHER;
+                ';
 
-            // Define the parameters
-            $imageURL = !isset($request->course_img)? $request->query->get('prev_img'):$this->getImgUrl($request);
+            // Check if an image URL is provided, otherwise use the previous image URL
+            $imageURL = $request->has('course_img') ? $this->getImgUrl($request) : $request->query->get('prev_img');
+
+            // Define the parameters for the query
             $params = [
-                "id" => $request->query->get('course_id'),
+                "id" => (int)$request->query->get('course_id'),
                 "title" => $request->course_title,
                 "category" => $request->course_category,
                 "level" => $request->course_level,
@@ -155,12 +180,31 @@ class courseRepository implements courseRepositoryInterface
                 "imageURL" => $imageURL,
             ];
 
-            // Execute the query and get the result
+            // Execute the query
             $result = $this->dbsession->run($query, $params);
-
             $course = $result->first()->get('c');
-            dd($course);
+
             return $course->getId();
+        } catch (QueryException $e) {
+            Log::error("Database Error while update Course Node: {$e->getMessage()}", ["request" => $request->all()]);
+            throw new \Exception("A Database Error occurred, Please try again later.");
+        } catch (\Exception $e) {
+            Log::error("Unexpected Error while update Course Node: {$e->getMessage()}", ["request" => $request->all()]);
+            throw new \Exception("An Unexpected Error occurred, please contact your support administrator.");
+        }
+    }
+
+    public function deleteCourse(Request $request)
+    {
+        try {
+            // Run a query to update a node
+            $query = 'MATCH (c:Course) WHERE ID(c) = $id DELETE c';
+
+            // Define the parameters for the query
+            $params = [ "id" => (int)$request->query->get('course_id') ];
+
+            // Execute the query
+            $this->dbsession->run($query, $params);
         } catch (QueryException $e) {
             Log::error("Database Error while update Course Node: {$e->getMessage()}", ["request" => $request->all()]);
             throw new \Exception("A Database Error occurred, Please try again later.");

@@ -18,6 +18,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(userRepositoryInterface::class, userRepository::class);
         $this->app->bind(courseRepositoryInterface::class, courseRepository::class);
+        // Bind custom services
+        $this->app->bind(Neo4jUserProvider::class, function ($app) {
+            return new Neo4jUserProvider();
+        });
     }
 
     /**
@@ -25,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register Neo4jUserProvider for authentication
         Auth::provider('neo4j', function ($app, array $config) {
             return new Neo4jUserProvider();
         });

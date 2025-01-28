@@ -34,17 +34,18 @@ class courseController extends Controller
         ]);
         try{
             $result = $this->courseService->getCourse($request);
+
             return view('dashboard.course.show', ['course' => $result['data'], 'message' => $result['message']]);
         }catch(\Exception $e){
             return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 
-    public function showAllCourses()
+    public function showAllCourses(Request $request)
     {
         try{
-            $result = $this->courseService->getAllCourses();
-            return view('dashboard.course.list', ['courses' => $result['data'], 'message' => $result['message']]);
+            $paginatedCourses = $this->courseService->getAllCourses($request);
+            return view('dashboard.course.list',['courses' => $paginatedCourses]);
         }catch(\Exception $e){
             return back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -69,6 +70,16 @@ class courseController extends Controller
         try{
             $result = $this->courseService->editCourse($request);
             return redirect()->route('showCourse', ['course_id'=>$result['data']])->with(["success"=>$result['message'], ]);
+        }catch(\Exception $e){
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function deleteCourse(Request $request)
+    {
+        try{
+            $result = $this->courseService->deleteCourse($request);
+            return redirect()->route('showAllCourses')->with(["success"=>$result['message']]);
         }catch(\Exception $e){
             return back()->withErrors(['error' => $e->getMessage()]);
         }

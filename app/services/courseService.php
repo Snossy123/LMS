@@ -40,15 +40,11 @@ class courseService
         }
     }
 
-    public function getAllCourses()
+    public function getAllCourses(Request $request)
     {
-
         try {
-            $courses = $this->courseRepoInterface->getAllCourses();
-            return [
-                'message' => 'Courses retrived successfully',
-                'data' => $courses
-            ];
+            $courses = $this->courseRepoInterface->index($request);
+            return $courses;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -62,6 +58,18 @@ class courseService
             return [
                 'message' => 'Course Updated Successfully',
                 'data' => $courseId
+            ];
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function deleteCourse(Request $request)
+    {
+        try {
+            $this->courseRepoInterface->deleteCourse($request);
+            return [
+                'message' => 'Course Deleted Successfully',
             ];
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());

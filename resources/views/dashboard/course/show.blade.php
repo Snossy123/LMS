@@ -9,7 +9,8 @@
                     <div class="row d-flex justify-content-center text-center">
                         <div class="col-lg-8">
                             <h1>Course Details</h1>
-                            <p class="mb-0">{{ isset($course['details']) ? $course['details'] : 'Unavailable details' }}</p>
+                            <p class="mb-0">{{ isset($course['details']) ? $course['details'] : 'Unavailable details' }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -31,7 +32,8 @@
 
                 <div class="row">
                     <div class="col-lg-8">
-                        <img src={{ isset($course['imageURL']) ? $course['imageURL'] : asset('Mentor/assets/img/course-details.jpg') }} class="img-fluid" alt="">
+                        <img src={{ isset($course['imageURL']) ? $course['imageURL'] : asset('Mentor/assets/img/course-details.jpg') }}
+                            class="img-fluid" alt="">
                         <h3>{{ isset($course['title']) ? $course['title'] : 'Unavailable Title' }}</h3>
                         <p>
                             {{ isset($course['description']) ? $course['description'] : 'Unavailable description' }}
@@ -63,11 +65,19 @@
                             <p> {{ isset($course['language']) ? $course['language'] : 'Unavailable language' }}</p>
                         </div>
 
+                        <div class="course-info d-flex justify-content-between align-items-center">
+                            <h5>Actions</h5>
+                            <div>
+                                <a href="{{ route('editCourse', ['course_id' => $course['id']]) }}"
+                                    class="btn btn-secondary text-white">Edit</a>
+                                @include('dashboard.course.delete', ['course_id' => $course['id']])
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
             </div>
-
         </section><!-- /Courses Course Details Section -->
     </main><!-- End #main -->
 @endsection

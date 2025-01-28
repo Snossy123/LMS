@@ -15,7 +15,7 @@ return [
 
     'defaults' => [
         'guard' => 'web',
-        'passwords' => 'users',
+        'provider' => 'neo4j', // Make sure this is set to 'neo4j'
     ],
 
     /*
@@ -36,21 +36,12 @@ return [
     */
 
     'guards' => [
-        // 'web' => [
-        //     'driver' => 'session',
-        //     'provider' => 'neo4j_users',
-        // ],
         'web' => [
             'driver' => 'session',
-            'provider' => 'neo4j', // Use your custom provider here
-        ],
-
-        'api' => [
-            'driver' => 'token',
-            'provider' => 'neo4j_users',
-            'hash' => false,
+            'provider' => 'neo4j', // Ensure this matches the provider you want to use
         ],
     ],
+
 
 
     /*
@@ -70,18 +61,10 @@ return [
     |
     */
 
-
-    // 'providers' => [
-    //     'neo4j' => [
-    //         'driver' => 'neo4j', // Custom driver name
-    //         'provider' => App\Providers\Neo4jUserProvider::class, // Your custom user provider
-    //     ],
-    // ],
-
     'providers' => [
-        'users' => [
-            'driver' => 'neo4j', // Custom provider name
-            'model' => App\Models\Neo4jUser::class, // Your user model
+        'neo4j' => [
+            'driver' => 'neo4j',
+            'model' => App\Models\Neo4jUser::class, // Your custom user model
         ],
     ],
 

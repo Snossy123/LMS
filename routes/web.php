@@ -29,7 +29,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
     Route::get('/showAllCourses', [courseController::class, 'showAllCourses'])->name('showAllCourses');
     Route::get('/editCourse', [courseController::class, 'editCoursePage'])->name('editCourse');
     Route::put('/editCourse', [courseController::class, 'editCourse']);
-    // Route::delete('/deleteCourse', [courseController::class, 'deleteCourse'])->name('deleteCourse');
+    Route::delete('/deleteCourse', [courseController::class, 'deleteCourse'])->name('deleteCourse');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginPage'])->name('login');
