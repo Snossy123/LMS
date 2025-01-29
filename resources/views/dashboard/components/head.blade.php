@@ -40,12 +40,12 @@
 
 <!-- Vendor CSS Files for Mentor -->
 {{-- <link href="{{ asset('Mentor/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-<link href="{{ asset('Mentor/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-<link href="{{ asset('Mentor/assets/vendor/aos/aos.css') }}" rel="stylesheet"> --}}
+<link href="{{ asset('Mentor/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">--}}
+{{-- <link href="{{ asset('Mentor/assets/vendor/aos/aos.css') }}" rel="stylesheet"> --}}
 <link href="{{ asset('Mentor/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
 <link href="{{ asset('Mentor/assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
 
-<!-- Main Mentor CSS File (Uncomment if needed) -->
+<!-- Main Mentor CSS File -->
 <link href="{{ asset('Mentor/assets/css/main.css') }}" rel="stylesheet">
 
 </head>

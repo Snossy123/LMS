@@ -28,6 +28,24 @@
         </ul>
       </li><!-- End Components Nav -->
 
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#components-nav2" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-person-badge"></i><span>Teachers</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="components-nav2" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href={{route('addTeacher')}}>
+              <i class="bi bi-circle"></i><span>Add Teacher</span>
+            </a>
+          </li>
+          <li>
+            <a href={{route('showAllTeachers')}}>
+              <i class="bi bi-circle"></i><span>View Teachers</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Components Nav -->
+
     </ul>
 
   </aside><!-- End Sidebar-->

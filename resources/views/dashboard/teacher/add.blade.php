@@ -9,7 +9,7 @@
                 <div class="container">
                     <div class="row d-flex justify-content-center text-center">
                         <div class="col-lg-8">
-                            <h1>Create New Course</h1>
+                            <h1>Add New Teacher</h1>
                         </div>
                     </div>
                 </div>
@@ -18,7 +18,7 @@
                 <div class="container">
                     <ol>
                         <li><a href={{ route('dashboard') }}>Dashboard</a></li>
-                        <li class="current">Add Course</li>
+                        <li class="current">Add Teacher</li>
                     </ol>
                 </div>
             </nav>
@@ -30,11 +30,11 @@
 
                     <div class="card-body">
 
-                        <form class="row g-3 needs-validation" novalidate method="post" action={{ route('addCourse') }}
+                        <form class="row g-3 needs-validation" novalidate method="post" action={{ route('addTeacher') }}
                             enctype="multipart/form-data">
                             @csrf
                             <div class="pt-4 pb-2">
-                                <h5 class="card-title text-center pb-0 fs-4">Course Information</h5>
+                                <h5 class="card-title text-center pb-0 fs-4">Teacher Information</h5>
                                 @if ($errors->any())
                                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                         <ul class="list-unstyled">
@@ -48,16 +48,28 @@
                                 @endif
                             </div>
                             <div class="col-lg-6">
-                                <label for="courseTitle" class="col-sm-2 col-lg-4 col-form-label">Course Title</label>
+                                <label for="teacherName" class="col-sm-2 col-lg-4 col-form-label">Teacher Name</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="course_title" required value="{{old('course_title')}}">
+                                    <input type="text" class="form-control" name="teacher_name" required value="{{old('teacher_name')}}">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="teacherEmail" class="col-sm-2 col-lg-4 col-form-label">Teacher Email</label>
+                                <div class="col-sm-10">
+                                    <input type="email" class="form-control" name="teacher_email" required value="{{old('teacher_email')}}">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="teacherPassword" class="col-sm-2 col-lg-4 col-form-label">Teacher Password</label>
+                                <div class="col-sm-10">
+                                    <input type="password" class="form-control" name="teacher_password" required value="{{old('teacher_password')}}">
                                 </div>
                             </div>
 
                             <div class="col-lg-6">
-                                <label class="col-sm-2 col-lg-4 col-form-label">Category</label>
+                                <label class="col-sm-2 col-lg-4 col-form-label">Specialty</label>
                                 <div class="col-sm-10">
-                                    <select class="form-select" aria-label="Default select example" name="course_category"
+                                    <select class="form-select" aria-label="Default select example" name="teacher_specialty"
                                         required>
                                         <option selected value="">Open this select menu</option>
                                         <option value="Web Development">Web Development</option>
@@ -68,45 +80,11 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
-                                <label class="col-sm-2 col-lg-4 col-form-label">Level</label>
-                                <div class="col-sm-10">
-                                    <select class="form-select" aria-label="Default select example" name="course_level"
-                                        required>
-                                        <option selected value="">Open this select menu</option>
-                                        <option value="Beginner">Beginner</option>
-                                        <option value="Intermediate">Intermediate</option>
-                                        <option value="Advanced">Advanced</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <label class="col-sm-2 col-lg-4 col-form-label">Language</label>
-                                <div class="col-sm-10">
-                                    <select class="form-select" aria-label="Default select example" name="course_language"
-                                        required>
-                                        <option selected value="">Open this select menu</option>
-                                        <option value="English">English</option>
-                                        <option value="Arabic">Arabic</option>
-                                        <option value="Spanish">Spanish</option>
-                                        <option value="French">French</option>
-                                    </select>
-                                </div>
-                            </div>
 
                             <div class="col-lg-6">
-                                <label for="course_description" class="col-sm-2 col-lg-4 col-form-label">Course
-                                    Description</label>
+                                <label for="teacher_about" class="col-sm-2 col-lg-4 col-form-label">About Teacher</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" style="height: 100px" name="course_description" required>{{old('course_description')}}</textarea>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <label for="course_description" class="col-sm-2 col-lg-4 col-form-label">Course
-                                    Details</label>
-                                <div class="col-sm-10">
-                                    <textarea class="form-control" style="height: 100px" name="course_details" required>{{old('course_details')}}</textarea>
+                                    <textarea class="form-control" style="height: 100px" name="teacher_about" required>{{old('teacher_about')}}</textarea>
                                 </div>
                             </div>
 
@@ -115,7 +93,7 @@
                                 <!-- Image Preview -->
                                 <div class="mb-4 d-flex justify-content-center">
                                     <img id="selectedImage" src="https://mdbootstrap.com/img/Photos/Others/placeholder.jpg"
-                                        alt="Image Preview" class="img-fluid rounded shadow" style="max-width: 300px;" />
+                                        alt="Image Preview" class="img-fluid rounded-circle shadow" style="max-width: 300px;" />
                                 </div>
 
                                 <!-- File Upload Button -->
@@ -123,15 +101,15 @@
                                     <label for="customFile1"
                                         class="btn btn-primary btn-rounded d-inline-flex align-items-center"
                                         style="cursor: pointer;">
-                                        <span class="text-white">Course Image</span>
-                                        <input type="file" class="form-control d-none" name="course_img" id="customFile1"
+                                        <span class="text-white">Teacher Image</span>
+                                        <input type="file" class="form-control d-none" name="teacher_img" id="customFile1"
                                             accept="image/*" onchange="displaySelectedImage(event, 'selectedImage')" />
                                     </label>
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <button class="btn btn-primary w-100" type="submit">Create Course</button>
+                                <button class="btn btn-primary w-100" type="submit">Add Teacher</button>
                             </div>
                         </form>
 
