@@ -130,6 +130,21 @@
                                 </div>
                             </div>
 
+                            <div class="col-lg-6">
+                                <label class="col-sm-2 col-lg-4 col-form-label">Teacher</label>
+                                <div class="col-sm-10">
+                                    <select class="form-select" aria-label="Default select example" name="course_teacher"
+                                        required>
+                                        <option selected value="">Open this select menu</option>
+                                        @forelse($teachers as $teacher)
+                                        <option value={{$teacher['id']}}>{{$teacher['name'].' '.$teacher['specialty']}} </option>
+                                        @empty
+                                        <option value="">No Teacher</option>
+                                        @endforelse
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="col-12">
                                 <button class="btn btn-primary w-100" type="submit">Create Course</button>
                             </div>

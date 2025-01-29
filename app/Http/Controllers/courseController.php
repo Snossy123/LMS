@@ -5,16 +5,18 @@ namespace App\Http\Controllers;
 use App\Http\Requests\courseCreationRequest;
 use App\Http\Requests\courseUpdateRequest;
 use App\Services\courseService;
+use App\Services\teacherService;
 use Illuminate\Http\Request;
 
 class courseController extends Controller
 {
-    public function __construct(protected courseService $courseService)
+    public function __construct(protected courseService $courseService, protected teacherService $teacherService)
     {
     }
     public function addCoursePage()
     {
-        return view('dashboard.course.add');
+        $teachers = $this->teacherService->getTeachers();
+        return view('dashboard.course.add', ["teachers" => $teachers]);
     }
 
     public function addCourse(courseCreationRequest $request)
@@ -58,8 +60,9 @@ class courseController extends Controller
         ]);
 
         try{
+            $teachers = $this->teacherService->getTeachers();
             $result = $this->courseService->getCourse($request);
-            return view('dashboard.course.edit', ['course' => $result['data'], 'message' => $result['message']]);
+            return view('dashboard.course.edit', ['course' => $result['data'], 'message' => $result['message'], "teachers" => $teachers]);
         }catch(\Exception $e){
             return back()->withErrors(['error' => $e->getMessage()]);
         }

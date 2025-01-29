@@ -43,8 +43,9 @@
 
                         <div class="course-info d-flex justify-content-between align-items-center">
                             <h5>Teacher</h5>
-                            @if (isset($teacher['name']))
-                                <p><a href="#">{{ $teacher['name'] }}</a></p>
+                            @if (isset($course['teacher_name']))
+                            {{-- replace # with route('teacherProfile', ["teacher_id"=>$course['teacher_id']]) --}}
+                                <p><a href="#">{{ $course['teacher_name'] }}</a></p>
                             @else
                                 <p>Unavailable Teacher</p>
                             @endif

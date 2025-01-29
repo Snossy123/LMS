@@ -55,10 +55,10 @@
                                         <tr>
                                             <td>{{ $loop->iteration + ($courses->currentPage() - 1) * $courses->perPage() }}
                                             </td>
-                                            <td>{{ $course['title'] }}</td>
-                                            <td>{{ $course['category'] }}</td>
-                                            <td>{{ $course['level'] }}</td>
-                                            <td>{{ $course['language'] }}</td>
+                                            <td>{{ $course['title']??'' }}</td>
+                                            <td>{{ $course['category']??'' }}</td>
+                                            <td>{{ $course['level']??'' }}</td>
+                                            <td>{{ $course['language']??'' }}</td>
                                             <td>
                                                 <a href="{{ route('showCourse', ['course_id' => $course['id']]) }}"
                                                     class="btn btn-primary">View</a>

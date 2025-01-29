@@ -30,7 +30,7 @@
 
                     <div class="card-body">
 
-                        <form class="row g-3 needs-validation" novalidate method="post" action={{ route('editCourse', ['course_id'=>$course['id']??0, 'prev_img'=>$course['imageURL']??'']) }}
+                        <form class="row g-3 needs-validation" novalidate method="post" action={{ route('editCourse', ['course_id'=>$course['id']??0, 'prev_img'=>$course['imageURL']??'', 'prev_teacher'=>$course['teacher_id']??'']) }}
                             enctype="multipart/form-data">
                             @csrf
                             @method('put')
@@ -155,6 +155,25 @@
                                         <input type="file" class="form-control d-none" name="course_img" id="customFile1"
                                             accept="image/*" onchange="displaySelectedImage(event, 'selectedImage')" />
                                     </label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label class="col-sm-2 col-lg-4 col-form-label">Teacher</label>
+                                <div class="col-sm-10">
+                                    <select class="form-select" aria-label="Default select example" name="course_teacher"
+                                        required>
+                                        <option value="" {{ empty($teachers) ? 'selected' : '' }}>Open this
+                                            select menu</option>
+                                        @forelse($teachers as $teacher)
+                                        <option value={{$teacher['id']}}
+                                        {{ isset($course['teacher_id']) && $course['teacher_id'] == $teacher['id'] ? 'selected' : '' }}>
+                                        {{$teacher['name'].' : '.$teacher['specialty']}} </option>
+
+                                        @empty
+                                        <option value="">No Teacher</option>
+                                        @endforelse
+                                    </select>
                                 </div>
                             </div>
 

@@ -61,9 +61,9 @@
                                                     alt="Image Preview" class="img-fluid rounded-circle shadow"
                                                     style="max-width: 40px;" />
                                             </td>
-                                            <td>{{ $teacher['name'] }}</td>
-                                            <td>{{ $teacher['email'] }}</td>
-                                            <td>{{ $teacher['specialty'] }}</td>
+                                            <td>{{ $teacher['name']??'' }}</td>
+                                            <td>{{ $teacher['email']??'' }}</td>
+                                            <td>{{ $teacher['specialty']??'' }}</td>
                                             <td>
                                                 <a href="{{ route('showTeacher', ['teacher_id' => $teacher['id']]) }}"
                                                     class="btn btn-primary">View</a>

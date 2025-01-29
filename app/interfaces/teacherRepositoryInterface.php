@@ -14,4 +14,5 @@ interface teacherRepositoryInterface
     public function index(Request $request);
     public function editTeacher(teacherUpdateRequest $request);
     public function deleteTeacher(Request $request);
+    public function getTeachers();
 }

@@ -24,7 +24,12 @@ class courseRepository implements courseRepositoryInterface
     {
         try {
             // Run a query to create a node
-            $query = 'create (c:Course {title:$title, category:$category, level:$level, language:$language, description:$description, details:$details, image:$imageURL}) return c';
+            $query = 'MERGE (c:Course {title:$title, category:$category, level:$level, language:$language, description:$description, details:$details, image:$imageURL})
+            with c
+                    MATCH (t:Teacher)
+                    WHERE ID(t) = $teacher_id
+                    CREATE (t)-[r:TEACH]->(c)
+                    return c';
 
             // Define the parameters
             $imageURL = $this->getImgUrl($request);
@@ -36,6 +41,7 @@ class courseRepository implements courseRepositoryInterface
                 "description" => $request->course_description,
                 "details" => $request->course_details,
                 "imageURL" => $imageURL,
+                "teacher_id" => (int) $request->course_teacher
             ];
 
             // Execute the query and get the result
@@ -55,26 +61,21 @@ class courseRepository implements courseRepositoryInterface
     public function getCourse(int $courseId): array
     {
         try {
-            $query = 'MATCH (c:Course) WHERE ID(c) = $courseID RETURN c';
+            $query = 'MATCH (c:Course) WHERE ID(c) = $courseID
+                    MATCH (c)<-[r:TEACH]-(t:Teacher)
+                    RETURN {id:ID(c), title:c.title,
+                    category:c.category, level:c.level, language:c.language,imageURL:c.image,details:c.details,description:c.description,
+                    teacher_id:ID(t), teacher_name:t.name}
+                    AS course';
             $result = $this->dbsession->run($query, ['courseID' => $courseId]);
-            $courseNode = $result->first()->get('c');
-            $courseProperties = $courseNode->getProperties()->toArray();
-            $course = [
-                'id' => $courseNode->getId(),
-                'title' => $courseProperties['title'] ?? null,
-                'category' => $courseProperties['category'] ?? null,
-                'level' => $courseProperties['level'] ?? null,
-                'language' => $courseProperties['language'] ?? null,
-                'description' => $courseProperties['description'] ?? null,
-                'details' => $courseProperties['details'] ?? null,
-                'imageURL' => $courseProperties['image'] ?? null,
-            ];
-            return $course;
+            $courseNode = $result->first()->get('course')->toArray();
+            return $courseNode;
         } catch (QueryException $e) {
             Log::error("Database Error while retrive Course Node: {$e->getMessage()}", ["course ID" => $courseId]);
             throw new \Exception("A Database Error occurred, Please try again later.");
         } catch (\Exception $e) {
             Log::error("Unexpected Error while retrive Course Node: {$e->getMessage()}", ["course ID" => $courseId]);
+            dd($e->getMessage());
             throw new \Exception("An Unexpected Error occurred, please contact your support administrator.");
         }
     }
@@ -86,17 +87,20 @@ class courseRepository implements courseRepositoryInterface
         $skip = ($page - 1) * $paginate;
 
         $query = 'MATCH (c:Course)
-                  WITH properties(c) AS props, id(c) AS id
+                  WITH count(c) AS totalCourses
+                  MATCH (c:Course)
                   SKIP $skip LIMIT $paginate
-                  RETURN collect(apoc.map.merge(props, {id: id})) AS courses';
+                  RETURN collect({id:ID(c), title:c.title, category:c.category, level:c.level, language:c.language})
+                   AS courses, totalCourses';
 
         $result = $this->dbsession->run($query, [
             'skip' => $skip,
             'paginate' => $paginate,
         ]);
 
-        $courses = $result->first()->get('courses')->toArray();
-        $totalCourses = $this->getTotalCoursesCount();
+        $record = $result->first();
+        $courses = $record->get('courses')->toArray();
+        $totalCourses = $record->get('totalCourses');
 
         $paginatedCourses = new \Illuminate\Pagination\LengthAwarePaginator(
             $courses,
@@ -107,27 +111,6 @@ class courseRepository implements courseRepositoryInterface
         );
 
         return $paginatedCourses;
-    }
-
-    public function getTotalCoursesCount(): int
-    {
-        try {
-            // Cypher query to retrieve paginated courses
-            $query = 'MATCH (c:Course)
-                      RETURN count(c) AS totalCourses';
-
-            // Execute query with parameters
-            $result = $this->dbsession->run($query);
-            return $result->first()->get('totalCourses');
-        } catch (QueryException $e) {
-            // Log query-specific errors and rethrow a user-friendly exception
-            Log::error("Database Error while retrieving courses: {$e->getMessage()}");
-            throw new \Exception("A database error occurred. Please try again later.");
-        } catch (\Exception $e) {
-            // Log unexpected errors and rethrow
-            Log::error("Unexpected error while retrieving courses: {$e->getMessage()}");
-            throw new \Exception("An unexpected error occurred. Please contact support.");
-        }
     }
 
     public function getImgUrl(courseCreationRequest|courseUpdateRequest $request)
@@ -170,7 +153,7 @@ class courseRepository implements courseRepositoryInterface
 
             // Define the parameters for the query
             $params = [
-                "id" => (int)$request->query->get('course_id'),
+                "id" => (int) $request->query->get('course_id'),
                 "title" => $request->course_title,
                 "category" => $request->course_category,
                 "level" => $request->course_level,
@@ -183,6 +166,26 @@ class courseRepository implements courseRepositoryInterface
             // Execute the query
             $result = $this->dbsession->run($query, $params);
             $course = $result->first()->get('c');
+
+
+            $prev_teacher = (int)$request->query('prev_teacher');
+            $new_teacher = (int)$request->course_teacher;
+            // if teacher change need to drop relationship and create new relationship
+            if($prev_teacher !== $new_teacher){
+                $query = 'MATCH (t:Teacher) WHERE ID(t)=$prev_teacher
+                        MATCH (c:Course) WHERE ID(c)=$course_id
+                        MATCH (t)-[r:TEACH]->(c)
+                        DELETE r
+                        WITH c,t
+                        MATCH (new_t:Teacher) WHERE ID(new_t)=$new_teacher
+                        CREATE (new_t)-[r_new:TEACH]->(c)';
+                $params = [
+                    "prev_teacher" => $prev_teacher,
+                    "course_id" => $course->getId(),
+                    "new_teacher" => $new_teacher
+                ];
+                $this->dbsession->run($query, $params);
+            }
 
             return $course->getId();
         } catch (QueryException $e) {
@@ -201,7 +204,7 @@ class courseRepository implements courseRepositoryInterface
             $query = 'MATCH (c:Course) WHERE ID(c) = $id DELETE c';
 
             // Define the parameters for the query
-            $params = [ "id" => (int)$request->query->get('course_id') ];
+            $params = ["id" => (int) $request->query->get('course_id')];
 
             // Execute the query
             $this->dbsession->run($query, $params);

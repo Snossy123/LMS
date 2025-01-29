@@ -75,4 +75,13 @@ class teacherService
             throw new \Exception($e->getMessage());
         }
     }
+
+    public function getTeachers()
+    {
+        try {
+            return $this->teacherRepoInterface->getTeachers();
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
 }

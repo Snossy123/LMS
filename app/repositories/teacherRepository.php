@@ -20,7 +20,7 @@ class teacherRepository implements teacherRepositoryInterface
     {
         try {
             // Run a query to create a node
-            $query = 'create (t:Teacher {name:$name, email:$email, password:$password, specialty:$specialty, about:$about, image:$imageURL}) return t';
+            $query = 'create (t:Person:Teacher {name:$name, email:$email, password:$password, specialty:$specialty, about:$about, image:$imageURL}) return t';
 
             // Define the parameters
             $imageURL = $this->getImgUrl($request);
@@ -78,18 +78,20 @@ class teacherRepository implements teacherRepositoryInterface
         $paginate = 10;
         $skip = ($page - 1) * $paginate;
 
-        $query = 'MATCH (c:Teacher)
-                  WITH properties(c) AS props, id(c) AS id
+        $query = 'MATCH (t:Teacher)
+                  WITH count(t) AS totalTeachers
+                  MATCH (t:Teacher)
                   SKIP $skip LIMIT $paginate
-                  RETURN collect(apoc.map.merge(props, {id: id})) AS teachers';
+                  RETURN collect({id:ID(t), name:t.name, email:t.email, specialty:t.specialty}) AS teachers, totalTeachers';
 
         $result = $this->dbsession->run($query, [
             'skip' => $skip,
             'paginate' => $paginate,
         ]);
 
-        $teachers = $result->first()->get('teachers')->toArray();
-        $totalTeachers = $this->getTotalTeachersCount();
+        $record = $result->first();
+        $teachers = $record->get('teachers')->toArray();
+        $totalTeachers = $record->get('totalTeachers');
 
         $paginatedTeachers = new \Illuminate\Pagination\LengthAwarePaginator(
             $teachers,
@@ -100,27 +102,6 @@ class teacherRepository implements teacherRepositoryInterface
         );
 
         return $paginatedTeachers;
-    }
-
-    public function getTotalTeachersCount(): int
-    {
-        try {
-            // Cypher query to retrieve paginated teachers
-            $query = 'MATCH (c:Teacher)
-                      RETURN count(c) AS totalTeachers';
-
-            // Execute query with parameters
-            $result = $this->dbsession->run($query);
-            return $result->first()->get('totalTeachers');
-        } catch (QueryException $e) {
-            // Log query-specific errors and rethrow a user-friendly exception
-            Log::error("Database Error while retrieving teachers: {$e->getMessage()}");
-            throw new \Exception("A database error occurred. Please try again later.");
-        } catch (\Exception $e) {
-            // Log unexpected errors and rethrow
-            Log::error("Unexpected error while retrieving teachers: {$e->getMessage()}");
-            throw new \Exception("An unexpected error occurred. Please contact support.");
-        }
     }
 
     public function getImgUrl(teacherCreationRequest|teacherUpdateRequest $request)
@@ -203,5 +184,17 @@ class teacherRepository implements teacherRepositoryInterface
             Log::error("Unexpected Error while update Teacher Node: {$e->getMessage()}", ["request" => $request->all()]);
             throw new \Exception("An Unexpected Error occurred, please contact your support administrator.");
         }
+    }
+
+    public function getTeachers()
+    {
+        $query = 'MATCH (t:Teacher)
+                  RETURN collect({id:ID(t), name:t.name, email:t.email, specialty:t.specialty}) AS teachers';
+
+        $result = $this->dbsession->run($query);
+
+        $record = $result->first();
+        $teachers = $record->get('teachers')->toArray();
+        return $teachers;
     }
 }

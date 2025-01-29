@@ -26,9 +26,10 @@ class courseCreationRequest extends FormRequest
             'course_category'=> 'required|string',
             'course_level'=> 'required|string',
             'course_language'=> 'required|string',
-            'course_description' => 'required|string|min:10|max:2000|regex:/^[a-zA-Z0-9\s&\-.,()]+$/',
-            'course_details' => 'required|string|min:20|max:2000|regex:/^[a-zA-Z0-9\s&\-.,()]+$/',
+            'course_description' => 'required|string|min:5|max:2000|regex:/^[a-zA-Z0-9\s&\-.,()]+$/',
+            'course_details' => 'required|string|min:5|max:2000|regex:/^[a-zA-Z0-9\s&\-.,()]+$/',
             'course_img' => 'required|mimes:png,jpg|max:10240',
+            'course_teacher' => 'required|integer'
         ];
     }
 }
