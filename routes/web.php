@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\courseController;
+use App\Http\Controllers\studentController;
 use App\Http\Controllers\teacherController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,16 @@ Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
     Route::get('/editTeacher', [teacherController::class, 'editTeacherPage'])->name('editTeacher');
     Route::put('/editTeacher', [teacherController::class, 'editTeacher']);
     Route::delete('/deleteTeacher', [teacherController::class, 'deleteTeacher'])->name('deleteTeacher');
+
+    // Students Section
+    Route::get('/addStudent', [studentController::class, 'addStudentPage'])->name('addStudent');
+    Route::post('/addStudent', [studentController::class, 'addStudent']);
+    Route::get('/showStudent', [studentController::class, 'showStudent'])->name('showStudent');
+    Route::get('/showAllStudents', [studentController::class, 'showAllStudents'])->name('showAllStudents');
+    Route::get('/editStudent', [studentController::class, 'editStudentPage'])->name('editStudent');
+    Route::put('/editStudent', [studentController::class, 'editStudent']);
+    Route::delete('/deleteStudent', [studentController::class, 'deleteStudent'])->name('deleteStudent');
+
 });
 
 Route::get('/login', [LoginController::class, 'showLoginPage'])->name('login');

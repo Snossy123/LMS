@@ -170,7 +170,7 @@ class teacherRepository implements teacherRepositoryInterface
     {
         try {
             // Run a query to update a node
-            $query = 'MATCH (t:Teacher) WHERE ID(t) = $id DELETE t';
+            $query = 'MATCH (t:Teacher) WHERE ID(t) = $id DETACH DELETE t';
 
             // Define the parameters for the query
             $params = ["id" => (int) $request->query->get('teacher_id')];

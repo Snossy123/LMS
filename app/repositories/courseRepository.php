@@ -201,7 +201,7 @@ class courseRepository implements courseRepositoryInterface
     {
         try {
             // Run a query to update a node
-            $query = 'MATCH (c:Course) WHERE ID(c) = $id DELETE c';
+            $query = 'MATCH (c:Course) WHERE ID(c) = $id DETACH DELETE c';
 
             // Define the parameters for the query
             $params = ["id" => (int) $request->query->get('course_id')];

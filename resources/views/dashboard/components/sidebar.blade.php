@@ -46,6 +46,24 @@
         </ul>
       </li><!-- End Components Nav -->
 
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#components-nav3" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-person-circle"></i><span>Students</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="components-nav3" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href={{route('addStudent')}}>
+              <i class="bi bi-circle"></i><span>Add Student</span>
+            </a>
+          </li>
+          <li>
+            <a href={{route('showAllStudents')}}>
+              <i class="bi bi-circle"></i><span>View Students</span>
+            </a>
+          </li>
+        </ul>
+      </li><!-- End Components Nav -->
+
     </ul>
 
   </aside><!-- End Sidebar-->

@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Interfaces\courseRepositoryInterface;
+use App\Interfaces\studentRepositoryInterface;
 use App\Interfaces\teacherRepositoryInterface;
 use App\Interfaces\userRepositoryInterface;
 use App\Repositories\courseRepository;
+use App\Repositories\studentRepository;
 use App\Repositories\teacherRepository;
 use App\Repositories\userRepository;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(userRepositoryInterface::class, userRepository::class);
         $this->app->bind(courseRepositoryInterface::class, courseRepository::class);
         $this->app->bind(teacherRepositoryInterface::class, teacherRepository::class);
+        $this->app->bind(studentRepositoryInterface::class, studentRepository::class);
         // Bind custom services
         $this->app->bind(Neo4jUserProvider::class, function ($app) {
             return new Neo4jUserProvider();
