@@ -38,7 +38,8 @@ class courseController extends Controller
         try{
             $result = $this->courseService->getCourse($request);
             if(Auth::user()->data['type'] === 'Student'){
-                return view('frontend.courses.show',['course' => $result['data'], 'message' => $result['message']]);
+                $enrolled = $this->courseService->checkStudentEnroll($request);
+                return view('frontend.courses.show',['course' => $result['data'], 'message' => $result['message'], 'enrolled' => $enrolled]);
             }else{
                 return view('dashboard.course.show', ['course' => $result['data'], 'message' => $result['message']]);
             }

@@ -245,9 +245,9 @@ class courseRepository implements courseRepositoryInterface
         $skip = ($page - 1) * $paginate;
 
         $query = 'MATCH (s:Student)-[:ENROLL_IN]->(c:Course)
-                    WHERE ID(s) = 8
+                    WHERE ID(s) = $student_id
                     WITH c, count(c) AS totalCourses
-                    SKIP 0 LIMIT 3
+                    SKIP $skip LIMIT $paginate
                     OPTIONAL MATCH (c)<-[r:TEACH]-(t:Teacher)
                     RETURN
                     COLLECT({
@@ -267,6 +267,7 @@ class courseRepository implements courseRepositoryInterface
         $result = $this->dbsession->run($query, [
             'skip' => $skip,
             'paginate' => $paginate,
+            'student_id' => Auth::user()->data['id']
         ]);
 
         $record = $result->first();
@@ -283,4 +284,22 @@ class courseRepository implements courseRepositoryInterface
 
         return $paginatedCourses;
     }
+
+    public function checkStudentEnroll(Request $request)
+    {
+        $query = 'OPTIONAL MATCH (s:Student)-[:ENROLL_IN]->(c:Course)
+                  WHERE ID(s) = $student_id AND ID(c) = $course_id
+                  RETURN c IS NOT NULL AS enrolled';
+
+        $result = $this->dbsession->run($query, [
+            'student_id' => Auth::user()->data['id'],
+            'course_id' => (int) $request->query('course_id')
+        ]);
+
+        $record = $result->first();
+        $enrolled = $record->get('enrolled');
+
+        return $enrolled;
+    }
+
 }

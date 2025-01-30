@@ -85,4 +85,14 @@ class courseService
             throw new \Exception($e->getMessage());
         }
     }
+
+    public function checkStudentEnroll(Request $request)
+    {
+        try {
+            $courses = $this->courseRepoInterface->checkStudentEnroll($request);
+            return $courses;
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
 }

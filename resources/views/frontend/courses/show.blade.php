@@ -69,8 +69,12 @@
                         <div class="course-info d-flex justify-content-between align-items-center">
                             <h5>Actions</h5>
                             <div>
+                                @if (isset($enrolled))
+                                <button class="btn btn-success" disabled>Enrolled</button>
+                                @else
                                 <a href="{{ route('enrollInCourse', ['course_id' => $course['id']]) }}"
                                     class="btn btn-success text-white">Enroll</a>
+                                @endif
                             </div>
                         </div>
 

@@ -14,4 +14,5 @@ interface courseRepositoryInterface
     public function editCourse(courseUpdateRequest $request);
     public function deleteCourse(Request $request);
     public function studentCourses(Request $request);
+    public function checkStudentEnroll(Request $request);
 }
