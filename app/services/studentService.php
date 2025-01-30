@@ -75,4 +75,16 @@ class studentService
             throw new \Exception($e->getMessage());
         }
     }
+
+    public function enrollInCourse(Request $request)
+    {
+        try {
+            $this->studentRepoInterface->enrollInCourse($request);
+            return [
+                'message' => 'Course Enroll Successfully',
+            ];
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
 }

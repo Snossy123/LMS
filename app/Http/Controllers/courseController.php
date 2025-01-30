@@ -7,6 +7,7 @@ use App\Http\Requests\courseUpdateRequest;
 use App\Services\courseService;
 use App\Services\teacherService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class courseController extends Controller
 {
@@ -36,8 +37,11 @@ class courseController extends Controller
         ]);
         try{
             $result = $this->courseService->getCourse($request);
-
-            return view('dashboard.course.show', ['course' => $result['data'], 'message' => $result['message']]);
+            if(Auth::user()->data['type'] === 'Student'){
+                return view('frontend.courses.show',['course' => $result['data'], 'message' => $result['message']]);
+            }else{
+                return view('dashboard.course.show', ['course' => $result['data'], 'message' => $result['message']]);
+            }
         }catch(\Exception $e){
             return back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -47,7 +51,11 @@ class courseController extends Controller
     {
         try{
             $paginatedCourses = $this->courseService->getAllCourses($request);
-            return view('dashboard.course.list',['courses' => $paginatedCourses]);
+            if(Auth::user()->data['type'] === 'Student'){
+                return view('frontend.courses.list',['courses' => $paginatedCourses]);
+            }else{
+                return view('dashboard.course.list',['courses' => $paginatedCourses]);
+            }
         }catch(\Exception $e){
             return back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -83,6 +91,16 @@ class courseController extends Controller
         try{
             $result = $this->courseService->deleteCourse($request);
             return redirect()->route('showAllCourses')->with(["success"=>$result['message']]);
+        }catch(\Exception $e){
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function studentCourses(Request $request)
+    {
+        try{
+            $paginatedCourses = $this->courseService->studentCourses($request);
+            return view('frontend.courses.list',['courses' => $paginatedCourses,'myCourses'=>true]);
         }catch(\Exception $e){
             return back()->withErrors(['error' => $e->getMessage()]);
         }

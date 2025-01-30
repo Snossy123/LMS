@@ -7,6 +7,7 @@ use App\Http\Requests\studentUpdateRequest;
 use App\Interfaces\studentRepositoryInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class studentRepository implements studentRepositoryInterface
@@ -183,10 +184,31 @@ class studentRepository implements studentRepositoryInterface
             $params = ["id" => (int) $request->query('student_id')];
             $this->dbsession->run($query, $params);
         } catch (QueryException $e) {
-            Log::error("Database Error while update Student Node: {$e->getMessage()}", ["request" => $request->all()]);
+            Log::error("Database Error while delete Student Node: {$e->getMessage()}", ["request" => $request->all()]);
             throw new \Exception("A Database Error occurred, Please try again later.");
         } catch (\Exception $e) {
-            Log::error("Unexpected Error while update Student Node: {$e->getMessage()}", ["request" => $request->all()]);
+            Log::error("Unexpected Error while delete Student Node: {$e->getMessage()}", ["request" => $request->all()]);
+            throw new \Exception("An Unexpected Error occurred, please contact your support administrator.");
+        }
+    }
+
+    public function enrollInCourse(Request $request)
+    {
+        try{
+            // Define the query to create a relationship between the student and course node
+            $query = 'MATCH (s:Student) WHERE ID(s) = $student_id
+                      MATCH (c:Course) WHERE ID(c) = $course_id
+                      CREATE (s)-[r:ENROLL_IN {enroll_date:datetime()}]->(c)';
+            $params = [
+            "course_id" => (int) $request->query('course_id'),
+            "student_id" => (int) Auth::user()->data['id']
+            ];
+            $this->dbsession->run($query, $params); 
+        } catch (QueryException $e) {
+            Log::error("Database Error while enroll Student in course Node: {$e->getMessage()}", ["request" => $request->all()]);
+            throw new \Exception("A Database Error occurred, Please try again later.");
+        } catch (\Exception $e) {
+            Log::error("Unexpected Error while enroll Student in course Node: {$e->getMessage()}", ["request" => $request->all()]);
             throw new \Exception("An Unexpected Error occurred, please contact your support administrator.");
         }
     }

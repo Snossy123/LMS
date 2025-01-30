@@ -75,4 +75,14 @@ class courseService
             throw new \Exception($e->getMessage());
         }
     }
+
+    public function studentCourses(Request $request)
+    {
+        try {
+            $courses = $this->courseRepoInterface->studentCourses($request);
+            return $courses;
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
 }

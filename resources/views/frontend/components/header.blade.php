@@ -11,7 +11,7 @@
             <ul>
                 <li><a href="index.html" class="active">Home<br></a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="courses.html">Courses</a></li>
+                <li><a href={{route("courses")}}>Courses</a></li>
                 <li><a href="trainers.html">Trainers</a></li>
                 <li><a href="events.html">Events</a></li>
                 <li><a href="pricing.html">Pricing</a></li>

@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+// students frontend routes
+Route::get('/showCourses', [courseController::class, 'showAllCourses'])->name('courses');
+Route::get('/showCourse', [courseController::class, 'showCourse'])->name('showCourse');
+Route::get('/enrollInCourse', [studentController::class, 'enrollInCourse'])->name('enrollInCourse');;
+Route::get('/studentCourses', [courseController::class, 'studentCourses'])->name('studentCourses');
 
 Route::get('/', function () {
     return view('frontend.home.layout');
@@ -52,6 +57,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
     Route::delete('/deleteStudent', [studentController::class, 'deleteStudent'])->name('deleteStudent');
 
 });
+
 
 Route::get('/login', [LoginController::class, 'showLoginPage'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);

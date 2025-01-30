@@ -13,4 +13,5 @@ interface studentRepositoryInterface
     public function index(Request $request);
     public function editStudent(studentUpdateRequest $request);
     public function deleteStudent(Request $request);
+    public function enrollInCourse(Request $request);
 }

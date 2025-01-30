@@ -62,11 +62,19 @@ class courseRepository implements courseRepositoryInterface
     {
         try {
             $query = 'MATCH (c:Course) WHERE ID(c) = $courseID
-                    MATCH (c)<-[r:TEACH]-(t:Teacher)
-                    RETURN {id:ID(c), title:c.title,
-                    category:c.category, level:c.level, language:c.language,imageURL:c.image,details:c.details,description:c.description,
-                    teacher_id:ID(t), teacher_name:t.name}
-                    AS course';
+                    OPTIONAL MATCH (c)<-[r:TEACH]-(t:Teacher)
+                    RETURN {
+                    id:ID(c),
+                    title:c.title,
+                    category:c.category,
+                    level:c.level,
+                    language:c.language,
+                    imageURL:c.image,
+                    details:c.details,
+                    description:c.description,
+                    teacher_id: CASE WHEN t IS NOT NULL THEN ID(t) ELSE NULL END,
+                    teacher_name:CASE WHEN t IS NOT NULL THEN t.name ELSE NULL END
+                    }AS course';
             $result = $this->dbsession->run($query, ['courseID' => $courseId]);
             $courseNode = $result->first()->get('course')->toArray();
             return $courseNode;
@@ -90,8 +98,21 @@ class courseRepository implements courseRepositoryInterface
                   WITH count(c) AS totalCourses
                   MATCH (c:Course)
                   SKIP $skip LIMIT $paginate
-                  RETURN collect({id:ID(c), title:c.title, category:c.category, level:c.level, language:c.language})
-                   AS courses, totalCourses';
+                  OPTIONAL MATCH (c)<-[r:TEACH]-(t:Teacher)
+                  RETURN
+                    COLLECT({
+                        id: ID(c),
+                        title: c.title,
+                        category: c.category,
+                        level: c.level,
+                        language: c.language,
+                        imageURL: c.image,
+                        details: c.details,
+                        description: c.description,
+                        teacher_id: CASE WHEN t IS NOT NULL THEN ID(t) ELSE NULL END,
+                        teacher_name: CASE WHEN t IS NOT NULL THEN t.name ELSE NULL END
+                    }) AS courses,
+                    totalCourses';
 
         $result = $this->dbsession->run($query, [
             'skip' => $skip,
@@ -215,5 +236,51 @@ class courseRepository implements courseRepositoryInterface
             Log::error("Unexpected Error while update Course Node: {$e->getMessage()}", ["request" => $request->all()]);
             throw new \Exception("An Unexpected Error occurred, please contact your support administrator.");
         }
+    }
+
+    public function studentCourses(Request $request)
+    {
+        $page = $request->query('page', 1);
+        $paginate = 10;
+        $skip = ($page - 1) * $paginate;
+
+        $query = 'MATCH (s:Student)-[:ENROLL_IN]->(c:Course)
+                    WHERE ID(s) = 8
+                    WITH c, count(c) AS totalCourses
+                    SKIP 0 LIMIT 3
+                    OPTIONAL MATCH (c)<-[r:TEACH]-(t:Teacher)
+                    RETURN
+                    COLLECT({
+                        id: ID(c),
+                        title: c.title,
+                        category: c.category,
+                        level: c.level,
+                        language: c.language,
+                        imageURL: c.image,
+                        details: c.details,
+                        description: c.description,
+                        teacher_id: CASE WHEN t IS NOT NULL THEN ID(t) ELSE NULL END,
+                        teacher_name: CASE WHEN t IS NOT NULL THEN t.name ELSE NULL END
+                    }) AS courses,
+                    totalCourses;';
+
+        $result = $this->dbsession->run($query, [
+            'skip' => $skip,
+            'paginate' => $paginate,
+        ]);
+
+        $record = $result->first();
+        $courses = $record->get('courses')->toArray();
+        $totalCourses = $record->get('totalCourses');
+
+        $paginatedCourses = new \Illuminate\Pagination\LengthAwarePaginator(
+            $courses,
+            $totalCourses,
+            $paginate,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return $paginatedCourses;
     }
 }

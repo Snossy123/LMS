@@ -84,4 +84,14 @@ class studentController extends Controller
             return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
+
+    public function enrollInCourse(Request $request)
+    {
+        try{
+            $result = $this->studentService->enrollInCourse($request);
+            return redirect()->route('studentCourses')->with(["success"=>$result['message']]);
+        }catch(\Exception $e){
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
 }
