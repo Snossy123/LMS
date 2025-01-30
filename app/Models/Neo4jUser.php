@@ -8,7 +8,7 @@ class Neo4jUser implements Authenticatable
 {
     use AuthenticatableTrait;
 
-    protected $data;
+    public $data;
 
     public function __construct(array $data)
     {
