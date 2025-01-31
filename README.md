@@ -10,14 +10,12 @@ Below is a **template for documentation** tailored to the **LMS (Learning Manage
 3. [Technologies Used](#technologies-used)
 4. [Installation](#installation)
 5. [Configuration](#configuration)
-6. [API Documentation](#api-documentation)
-7. [Usage](#usage)
-8. [Deployment](#deployment)
-9. [Testing](#testing)
-10. [Contributing](#contributing)
-11. [License](#license)
-12. [Acknowledgments](#acknowledgments)
-13. [Contact](#contact)
+6. [Usage](#usage)
+7. [Deployment](#deployment)
+8. [Contributing](#contributing)
+9. [License](#license)
+10. [Acknowledgments](#acknowledgments)
+11. [Contact](#contact)
 
 ---
 
@@ -111,20 +109,28 @@ Update `.env` for:
 ### Admin Dashboard
 - **Access**: `/admin/dashboard`
 - **Features**:
-  - Manage users, courses, and system settings.
-  - View analytics (e.g., active users, course enrollment).
+  - CRUD functionality for Courses
+  - CRUD functionality for Teachers
+  - CRUD functionality for Students
+  - Add Teaching relation between Teacher and Courses
+  - For each course only one Teacher is allowed to assign
+  - Login 
 
 ### Teacher Dashboard
 - **Access**: `/teacher/dashboard`
 - **Features**:
-  - Create/update courses.
-  - Generate student progress reports.
+  - View courses.
+  - CRUD functionality for Students
+  - Generate His Courses with His Students reports.
+  - Login
 
 ### Student Portal
 - **Access**: `/student/dashboard`
 - **Features**:
   - Enroll in courses.
-  - View course materials and track progress.
+  - View enrolled courses.
+  - View Courses.
+  - Login
 
 ---
 
@@ -167,6 +173,7 @@ This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for d
 ## Acknowledgments
 - [Laravel](https://laravel.com/) for the PHP framework.
 - [Bootstrap](https://getbootstrap.com/) for frontend components.
+- [Neo4j](https://neo4j.com/docs/cypher-manual/current/introduction/) for Graph Database
 
 ---
 
