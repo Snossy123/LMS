@@ -63,7 +63,7 @@ The **LMS** is a web-based platform designed to manage courses, students, teache
 ### Prerequisites
 - PHP ≥ 8.1
 - Composer
-- neo4j-php-client
+- [neo4j-php-client](https://github.com/neo4j-php/neo4j-php-client)
 - laravel-dompdf
 
 ### Steps
