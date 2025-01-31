@@ -12,32 +12,46 @@ use App\Http\Controllers\TeacherReportController;
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
+| Here is you can register web routes for your application. These
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 |
 */
 
-Route::get('/teacher-report/export', [TeacherReportController::class, 'exportPDF'])->name('export.pdf');
-
-// students frontend routes
-Route::get('/showCourses', [courseController::class, 'showAllCourses'])->name('courses');
-Route::get('/showCourse', [courseController::class, 'showCourse'])->name('showCourse');
-Route::get('/enrollInCourse', [studentController::class, 'enrollInCourse'])->name('enrollInCourse');
-;
-Route::get('/studentCourses', [courseController::class, 'studentCourses'])->name('studentCourses');
-
+//--------------------------------------------------
+// Main Landing Page Route
+//--------------------------------------------------
 Route::get('/', function () {
     return view('frontend.home.layout');
 });
 
+//--------------------------------------------------
+// Student Frontend Routes
+//--------------------------------------------------
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/showCourses', [courseController::class, 'showAllCourses'])->name('courses');
+    Route::get('/showCourse', [courseController::class, 'showCourse'])->name('showCourse');
+    Route::get('/enrollInCourse', [studentController::class, 'enrollInCourse'])->name('enrollInCourse');
+    Route::get('/studentCourses', [courseController::class, 'studentCourses'])->name('studentCourses');
+});
+
+//--------------------------------------------------
+// Authenticated Dashboard Routes
+//--------------------------------------------------
 Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
+    // Teacher Dashboard
     Route::get('/teacher', [teacherController::class, 'showDashboard'])->name('dashboard.teacher');
+    // Teacher Report Export Route
+    Route::get('/teacher-report/export', [TeacherReportController::class, 'exportPDF'])->name('export.pdf');
+
+    // Admin Dashboard
     Route::get('/admin', function () {
         return view('dashboard.admin');
     })->name('dashboard.admin');
 
-    // Courses Section
+    //--------------------------------------------------
+    // Course Management Routes
+    //--------------------------------------------------
     Route::get('/addCourse', [courseController::class, 'addCoursePage'])->name('addCourse');
     Route::post('/addCourse', [courseController::class, 'addCourse']);
     Route::get('/showCourse', [courseController::class, 'showCourse'])->name('showCourse');
@@ -46,7 +60,9 @@ Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
     Route::put('/editCourse', [courseController::class, 'editCourse']);
     Route::delete('/deleteCourse', [courseController::class, 'deleteCourse'])->name('deleteCourse');
 
-    // Teachers Section
+    //--------------------------------------------------
+    // Teacher Management Routes
+    //--------------------------------------------------
     Route::get('/addTeacher', [teacherController::class, 'addTeacherPage'])->name('addTeacher');
     Route::post('/addTeacher', [teacherController::class, 'addTeacher']);
     Route::get('/showTeacher', [teacherController::class, 'showTeacher'])->name('showTeacher');
@@ -55,7 +71,9 @@ Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
     Route::put('/editTeacher', [teacherController::class, 'editTeacher']);
     Route::delete('/deleteTeacher', [teacherController::class, 'deleteTeacher'])->name('deleteTeacher');
 
-    // Students Section
+    //--------------------------------------------------
+    // Student Management Routes
+    //--------------------------------------------------
     Route::get('/addStudent', [studentController::class, 'addStudentPage'])->name('addStudent');
     Route::post('/addStudent', [studentController::class, 'addStudent']);
     Route::get('/showStudent', [studentController::class, 'showStudent'])->name('showStudent');
@@ -63,44 +81,45 @@ Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
     Route::get('/editStudent', [studentController::class, 'editStudentPage'])->name('editStudent');
     Route::put('/editStudent', [studentController::class, 'editStudent']);
     Route::delete('/deleteStudent', [studentController::class, 'deleteStudent'])->name('deleteStudent');
-
 });
 
-
+//--------------------------------------------------
+// Authentication Routes
+//--------------------------------------------------
 Route::get('/login', [LoginController::class, 'showLoginPage'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
+//--------------------------------------------------
+// Neo4j Database Test Route (Temporary/Development)
+//--------------------------------------------------
 Route::get('/test-aura', function () {
     // Get the Neo4j client from the service container
     $client = app('neo4j');
 
-    // Open a session to run the query
+    // Create session and run test query
     $session = $client->createSession();
 
-    // Run a query to create a node
+    // Cypher query to create admin node
     $query = '
         MERGE (a:Admin:Person {name: $name, email: $email, password: $password})
         RETURN a
     ';
 
-    // Define the parameters
+    // Parameters for the query
     $params = [
         'name' => 'Admin User5',
         'email' => 'admin5@example.com',
-        'password' => bcrypt('admin123'), // Use a secure password
+        'password' => bcrypt('admin123'),
     ];
 
-    // Execute the query and get the result
+    // Execute query and get result
     $result = $session->run($query, $params);
-
-    // Fetch the node from the result
     $adminNode = $result->first()->get('a');
 
-    // Return a response
+    // Return JSON response with created node details
     return response()->json([
         'message' => 'Connection successful, node created.',
         'node' => $adminNode->getProperties(),
     ]);
 });
-
