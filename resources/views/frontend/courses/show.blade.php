@@ -18,7 +18,7 @@
             <nav class="breadcrumbs">
                 <div class="container">
                     <ol>
-                        <li><a href={{ route('dashboard') }}>Dashboard</a></li>
+                        <li><a href={{ route('dashboard.admin') }}>Dashboard</a></li>
                         <li class="current">Course Details</li>
                     </ol>
                 </div>
@@ -69,7 +69,7 @@
                         <div class="course-info d-flex justify-content-between align-items-center">
                             <h5>Actions</h5>
                             <div>
-                                @if (isset($enrolled))
+                                @if (isset($enrolled) && $enrolled)
                                 <button class="btn btn-success" disabled>Enrolled</button>
                                 @else
                                 <a href="{{ route('enrollInCourse', ['course_id' => $course['id']]) }}"

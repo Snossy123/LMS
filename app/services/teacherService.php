@@ -84,4 +84,12 @@ class teacherService
             throw new \Exception($e->getMessage());
         }
     }
+    public function reportData()
+    {
+        try {
+            return $this->teacherRepoInterface->reportData();
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
 }

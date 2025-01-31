@@ -156,7 +156,7 @@ class studentRepository implements studentRepositoryInterface
                 "id" => (int) $request->query->get('student_id'),
                 "name" => $request->student_name,
                 "email" => $request->student_email,
-                "password" => $request->student_password,
+                "password" => bcrypt($request->student_password),
                 "specialty" => $request->student_specialty,
                 "about" => $request->student_about,
                 "imageURL" => $imageURL
@@ -203,7 +203,7 @@ class studentRepository implements studentRepositoryInterface
             "course_id" => (int) $request->query('course_id'),
             "student_id" => (int) Auth::user()->data['id']
             ];
-            $this->dbsession->run($query, $params); 
+            $this->dbsession->run($query, $params);
         } catch (QueryException $e) {
             Log::error("Database Error while enroll Student in course Node: {$e->getMessage()}", ["request" => $request->all()]);
             throw new \Exception("A Database Error occurred, Please try again later.");

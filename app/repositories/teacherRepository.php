@@ -5,8 +5,8 @@ namespace App\Repositories;
 use App\Http\Requests\teacherCreationRequest;
 use App\Http\Requests\teacherUpdateRequest;
 use App\Interfaces\teacherRepositoryInterface;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class teacherRepository implements teacherRepositoryInterface
@@ -38,7 +38,7 @@ class teacherRepository implements teacherRepositoryInterface
             $teacher = $result->first()->get('t');
 
             return $teacher->getId();
-        } catch (QueryException $e) {
+        } catch (\Throwable $e) {
             Log::error("Database Error while creating Teacher Node: {$e->getMessage()}", ["request" => $request->all()]);
             throw new \Exception("A Database Error occurred, Please try again later.");
         } catch (\Exception $e) {
@@ -63,7 +63,7 @@ class teacherRepository implements teacherRepositoryInterface
                 'imageURL' => $teacherProperties['image'] ?? null,
             ];
             return $teacher;
-        } catch (QueryException $e) {
+        } catch (\Throwable $e) {
             Log::error("Database Error while retrive Teacher Node: {$e->getMessage()}", ["teacher ID" => $teacherId]);
             throw new \Exception("A Database Error occurred, Please try again later.");
         } catch (\Exception $e) {
@@ -157,7 +157,7 @@ class teacherRepository implements teacherRepositoryInterface
             $teacher = $result->first()->get('t');
 
             return $teacher->getId();
-        } catch (QueryException $e) {
+        } catch (\Throwable $e) {
             Log::error("Database Error while update Teacher Node: {$e->getMessage()}", ["request" => $request->all()]);
             throw new \Exception("A Database Error occurred, Please try again later.");
         } catch (\Exception $e) {
@@ -177,7 +177,7 @@ class teacherRepository implements teacherRepositoryInterface
 
             // Execute the query
             $this->dbsession->run($query, $params);
-        } catch (QueryException $e) {
+        } catch (\Throwable $e) {
             Log::error("Database Error while update Teacher Node: {$e->getMessage()}", ["request" => $request->all()]);
             throw new \Exception("A Database Error occurred, Please try again later.");
         } catch (\Exception $e) {
@@ -197,4 +197,60 @@ class teacherRepository implements teacherRepositoryInterface
         $teachers = $record->get('teachers')->toArray();
         return $teachers;
     }
+
+    public function reportData()
+     {
+        try {
+            $query = '
+                MATCH (t:Teacher)-[:TEACH]->(c:Course)
+                WHERE ID(t) = $teacher_id
+                OPTIONAL MATCH (c)<-[:ENROLL_IN]-(s:Student)
+
+                WITH
+                    t,
+                    c,
+                    count(s) AS totalCourseStudent,
+                    collect({
+                        id: ID(s),
+                        name: s.name,
+                        email: s.email,
+                        image: s.image
+                    }) AS students
+
+                WITH
+                    t,
+                    collect({
+                        title: c.title,
+                        category: c.category,
+                        level: c.level,
+                        totalCourseStudent: totalCourseStudent,
+                        students: students
+                    }) AS courses
+
+                RETURN {
+                        id: ID(t),
+                        name: t.name,
+                        specialty: t.specialty,
+                        image: t.image,
+                        totalCourses: size(coalesce(courses, [])),
+                        totalStudents: reduce(totalS = 0, course IN coalesce(courses, []) | totalS + course.totalCourseStudent),
+                        courses: courses
+                } AS teacher;
+            ';
+
+            $result = $this->dbsession->run($query, ['teacher_id' => (int) Auth::user()->data['id']]);
+
+            if ($result->count() == 0) {
+                throw new \Exception('No data found');
+            }
+
+            $record = $result->first();
+            return $record->get('teacher');
+
+        } catch (\Throwable $e) {
+            Log::error("Error fetching teacher report: {$e->getMessage()}");
+            throw new \Exception('An error occurred, please try again later');
+        }
+    }
+
 }

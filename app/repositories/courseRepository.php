@@ -292,7 +292,7 @@ class courseRepository implements courseRepositoryInterface
                   RETURN c IS NOT NULL AS enrolled';
 
         $result = $this->dbsession->run($query, [
-            'student_id' => Auth::user()->data['id'],
+            'student_id' => (int) Auth::user()->data['id'],
             'course_id' => (int) $request->query('course_id')
         ]);
 

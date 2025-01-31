@@ -84,4 +84,14 @@ class teacherController extends Controller
             return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
+
+    public function showDashboard()
+    {
+        try{
+            $teacherReport = $this->teacherService->reportData();
+            return view('dashboard.teacher',['teacher_report' => $teacherReport]);
+        }catch(\Exception $e){
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
 }

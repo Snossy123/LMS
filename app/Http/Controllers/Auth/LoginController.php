@@ -27,10 +27,13 @@ class LoginController extends Controller
         try{
             if($this->userRepository->attempt($credentials)){
                 $request->session()->regenerate();
-                if(Auth::user()->data['type']==='Student'){
+                if(Auth::user()->data['type']==='Admin'){
+                    return redirect()->route('dashboard.admin');
+                }elseif(Auth::user()->data['type']==='Teacher'){
+                    return redirect()->route('dashboard.teacher');
+                }else{
                     return redirect('/');
                 }
-                return redirect()->intended('/dashboard');
             }
         }catch(AuthenticationException $e){
             return back()->withErrors(['login' => $e->getMessage()]);

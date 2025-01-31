@@ -16,7 +16,7 @@
             <nav class="breadcrumbs">
                 <div class="container">
                     <ol>
-                        <li><a href={{ route('dashboard') }}>Dashboard</a></li>
+                        <li><a href={{ route('dashboard.admin') }}>Dashboard</a></li>
                         <li class="current">Student Details</li>
                     </ol>
                 </div>

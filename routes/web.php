@@ -5,6 +5,7 @@ use App\Http\Controllers\courseController;
 use App\Http\Controllers\studentController;
 use App\Http\Controllers\teacherController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TeacherReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,10 +17,14 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/teacher-report/export', [TeacherReportController::class, 'exportPDF'])->name('export.pdf');
+
 // students frontend routes
 Route::get('/showCourses', [courseController::class, 'showAllCourses'])->name('courses');
 Route::get('/showCourse', [courseController::class, 'showCourse'])->name('showCourse');
-Route::get('/enrollInCourse', [studentController::class, 'enrollInCourse'])->name('enrollInCourse');;
+Route::get('/enrollInCourse', [studentController::class, 'enrollInCourse'])->name('enrollInCourse');
+;
 Route::get('/studentCourses', [courseController::class, 'studentCourses'])->name('studentCourses');
 
 Route::get('/', function () {
@@ -27,7 +32,10 @@ Route::get('/', function () {
 });
 
 Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function () {
-    Route::get('/', function () {return view('dashboard.dashboard');})->name('dashboard');
+    Route::get('/teacher', [teacherController::class, 'showDashboard'])->name('dashboard.teacher');
+    Route::get('/admin', function () {
+        return view('dashboard.admin');
+    })->name('dashboard.admin');
 
     // Courses Section
     Route::get('/addCourse', [courseController::class, 'addCoursePage'])->name('addCourse');
@@ -63,7 +71,7 @@ Route::get('/login', [LoginController::class, 'showLoginPage'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/test-aura', function() {
+Route::get('/test-aura', function () {
     // Get the Neo4j client from the service container
     $client = app('neo4j');
 
