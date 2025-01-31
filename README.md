@@ -107,23 +107,6 @@ Update `.env` for:
 - **Environment**: create instance on Neo4j AuraDB and update database credentials
 ---
 
-## API Documentation
-### Endpoints
-| Method | Endpoint                | Description                     |
-|--------|-------------------------|---------------------------------|
-| GET    | `/api/courses`          | List all courses               |
-| POST   | `/api/courses`          | Create a new course            |
-| GET    | `/api/students`         | List enrolled students         |
-| GET    | `/api/reports/teacher`  | Generate teacher report        |
-
-### Example Request
-```bash
-curl -X GET http://localhost:8000/api/courses \
-  -H "Accept: application/json"
-```
-
----
-
 ## Usage
 ### Admin Dashboard
 - **Access**: `/admin/dashboard`
@@ -165,19 +148,6 @@ curl -X GET http://localhost:8000/api/courses \
 
 ---
 
-## Testing
-### PHPUnit Tests
-```bash
-php artisan test
-```
-
-### Browser Tests (Laravel Dusk)
-```bash
-php artisan dusk
-```
-
----
-
 ## Contributing
 1. Fork the repository.
 2. Create a feature branch:
@@ -202,9 +172,7 @@ This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for d
 
 ## Contact
 - **Author**: Snossy123
-- **Email**: [Your Email]
+- **Email**: soliemansnossy@gmail.com
 - **Issues**: [GitHub Issues](https://github.com/Snossy123/LMS/issues)
 
 ---
-
-This template can be adapted to your repository’s specifics. Update sections like **Features**, **APIs**, and **Installation** to reflect your actual codebase.
