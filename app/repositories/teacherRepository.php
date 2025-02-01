@@ -112,11 +112,8 @@ class TeacherRepository implements TeacherRepositoryInterface
                 WITH count(t) AS totalTeachers
                 MATCH (t:Teacher)
                 SKIP $skip LIMIT $paginate
-                RETURN collect({
-                    id: ID(t),
-                    name: t.name,
-                    email: t.email,
-                    specialty: t.specialty
+                RETURN collect(t{.*,
+                    id: ID(t)
                 }) AS teachers,
                 totalTeachers
             ';
