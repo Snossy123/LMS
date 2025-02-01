@@ -269,7 +269,7 @@ class TeacherRepository implements TeacherRepositoryInterface
             $file = $request->file('teacher_img');
             $fileName = uniqid() . $this->getSlugAttribute($file->getClientOriginalName()) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('teachers/images'), $fileName);
-            return asset('teachers/images/' . $fileName);
+            return 'teachers/images/' . $fileName;
         }
         return null;
     }

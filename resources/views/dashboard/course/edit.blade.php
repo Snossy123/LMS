@@ -142,7 +142,7 @@
                                 <!-- Image Preview -->
                                 <div class="mb-4 d-flex justify-content-center">
                                     <img id="selectedImage"
-                                        src={{ isset($course['imageURL']) && $course['imageURL'] ? $course['imageURL'] : 'https://mdbootstrap.com/img/Photos/Others/placeholder.jpg' }}
+                                        src={{ isset($course['imageURL']) && $course['imageURL'] ? asset($course['imageURL']) : 'https://mdbootstrap.com/img/Photos/Others/placeholder.jpg' }}
                                         alt="Image Preview" class="img-fluid rounded shadow" style="max-width: 300px;" />
                                 </div>
 

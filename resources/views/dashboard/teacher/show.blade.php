@@ -29,7 +29,7 @@
                 <div class="row gy-5">
                     <div class="col-lg-4 col-md-6 member" data-aos="fade-up" data-aos-delay="100">
                         <div class="member-img">
-                            <img src={{ isset($teacher['imageURL']) ? $teacher['imageURL'] : asset('/Mentor/assets/img/team/team-1.jpg') }}
+                            <img src={{ isset($teacher['imageURL']) ? asset($teacher['imageURL']) : asset('/Mentor/assets/img/team/team-1.jpg') }}
                                 class="img-fluid" alt="">
                             <div class="social">
                                 <a href="#"><i class="bi bi-twitter-x"></i></a>

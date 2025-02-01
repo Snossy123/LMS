@@ -280,7 +280,7 @@ class StudentRepository implements StudentRepositoryInterface
             $file = $request->file('student_img');
             $uniqueFileName = uniqid() . $this->getSlugAttribute($file->getClientOriginalName()) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('students/images'), $uniqueFileName);
-            return asset('students/images/' . $uniqueFileName);
+            return 'students/images/' . $uniqueFileName;
         }
         return null;
     }

@@ -32,7 +32,7 @@
 
                 <div class="row">
                     <div class="col-lg-8">
-                        <img src={{ isset($course['imageURL']) ? $course['imageURL'] : asset('Mentor/assets/img/course-details.jpg') }}
+                        <img src={{ isset($course['imageURL']) ? asset($course['imageURL']) : asset('Mentor/assets/img/course-details.jpg') }}
                             class="img-fluid" alt="">
                         <h3>{{ isset($course['title']) ? $course['title'] : 'Unavailable Title' }}</h3>
                         <p>

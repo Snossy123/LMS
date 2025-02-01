@@ -349,7 +349,7 @@ class CourseRepository implements CourseRepositoryInterface
             $file = $request->file('course_img');
             $uniqueFileName = uniqid() . $this->getSlugAttribute($file->getClientOriginalName()) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('courses/images'), $uniqueFileName);
-            return asset('courses/images/' . $uniqueFileName);
+            return 'courses/images/' . $uniqueFileName;
         }
         return null;
     }

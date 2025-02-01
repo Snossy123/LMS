@@ -57,7 +57,7 @@
                                             </td>
                                             <td>
                                                 <img id="selectedImage"
-                                                    src="{{ $student['image'] ?? 'https://mdbootstrap.com/img/Photos/Others/placeholder.jpg' }}"
+                                                    src="{{ asset($student['image']) ?? 'https://mdbootstrap.com/img/Photos/Others/placeholder.jpg' }}"
                                                     alt="Image Preview" class="img-fluid rounded-circle shadow"
                                                     style="max-width: 40px;" />
                                             </td>
